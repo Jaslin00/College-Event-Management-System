@@ -1,0 +1,145 @@
+{% extends "base.html" %}
+{% block content %}
+<style>
+    .activities-container {
+        max-width: 800px;
+        margin: 40px auto;
+    }
+
+    .activities-header {
+        margin-bottom: 2.5rem;
+    }
+
+    .activities-header h2 {
+        font-size: 2.2rem;
+        color: var(--text-primary);
+        font-weight: 700;
+    }
+
+    .activities-header p {
+        color: var(--text-secondary);
+        font-size: 1.05rem;
+        margin-top: 0.25rem;
+    }
+
+    .activity-card {
+        background: var(--white);
+        border-radius: 15px;
+        padding: 1.5rem 2rem;
+        box-shadow: 0 4px 15px rgba(0, 0, 0, 0.04);
+        margin-bottom: 1.25rem;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        border: 1px solid rgba(0, 0, 0, 0.02);
+        transition: all 0.3s ease;
+    }
+
+    .activity-card:hover {
+        transform: translateX(5px);
+        box-shadow: 0 6px 20px rgba(0, 0, 0, 0.08);
+    }
+
+    .activity-main {
+        display: flex;
+        flex-direction: column;
+        gap: 0.25rem;
+    }
+
+    .activity-name {
+        font-size: 1.25rem;
+        color: var(--text-primary);
+        font-weight: 700;
+    }
+
+    .activity-meta {
+        display: flex;
+        gap: 1.5rem;
+        color: var(--text-secondary);
+        font-size: 0.9rem;
+    }
+
+    .activity-meta-item {
+        display: flex;
+        align-items: center;
+        gap: 0.4rem;
+    }
+
+    .activity-meta-item i {
+        color: var(--primary-color);
+    }
+
+    .status-badge {
+        padding: 0.4rem 1rem;
+        border-radius: 20px;
+        font-size: 0.85rem;
+        font-weight: 600;
+        background: rgba(46, 204, 113, 0.15);
+        color: var(--secondary-color);
+    }
+
+    .no-activities {
+        text-align: center;
+        background: var(--white);
+        border-radius: 15px;
+        padding: 4rem 2rem;
+        box-shadow: 0 4px 15px rgba(0, 0, 0, 0.04);
+    }
+
+    .no-activities i {
+        font-size: 3.5rem;
+        color: var(--text-secondary);
+        margin-bottom: 1.5rem;
+        opacity: 0.5;
+    }
+
+    .no-activities p {
+        color: var(--text-secondary);
+        font-size: 1.1rem;
+        margin-bottom: 1.5rem;
+    }
+</style>
+
+<div class="activities-container">
+    <div class="activities-header">
+        <h2>My Registered Activities</h2>
+        <p>Keep track of the events you have registered for</p>
+    </div>
+
+    {% if activities %}
+        {% for activity in activities %}
+        <div class="activity-card">
+            <div class="activity-main">
+                <h3 class="activity-name">{{ activity.name }}</h3>
+                <div class="activity-meta">
+                    <div class="activity-meta-item">
+                        <i class="far fa-calendar-alt"></i>
+                        <span>{{ activity.date.strftime('%B %d, %Y') }}</span>
+                    </div>
+                    <div class="activity-meta-item">
+                        <i class="far fa-clock"></i>
+                        <span>{{ activity.time }}</span>
+                    </div>
+                </div>
+            </div>
+            <div style="display: flex; align-items: center; gap: 1.5rem;">
+                <span class="status-badge">
+                    <i class="fas fa-check-circle"></i> Registered
+                </span>
+                <a href="{{ url_for('event_details', event_id=activity.id) }}" class="btn btn-primary" style="padding: 0.5rem 1rem; font-size: 0.9rem; border-radius: 8px;">
+                    View Details
+                </a>
+            </div>
+        </div>
+        {% endfor %}
+    {% else %}
+        <div class="no-activities">
+            <i class="fas fa-calendar-times"></i>
+            <p>You have not registered for any events yet.</p>
+            <a href="{{ url_for('event_list') }}" class="btn btn-primary">
+                Browse Events
+            </a>
+        </div>
+    {% endif %}
+</div>
+{% endblock %}

@@ -1,0 +1,139 @@
+{% extends "base.html" %}
+{% block content %}
+<style>
+    .login-container {
+        max-width: 450px;
+        margin: 60px auto;
+        padding: 3rem;
+        background: var(--white);
+        border-radius: 20px;
+        box-shadow: 0 10px 30px rgba(0, 0, 0, 0.08);
+        text-align: center;
+    }
+
+    .login-header {
+        margin-bottom: 2.5rem;
+    }
+
+    .login-header i {
+        font-size: 3rem;
+        color: var(--primary-color);
+        margin-bottom: 1rem;
+    }
+
+    .login-header h2 {
+        font-size: 1.8rem;
+        color: var(--text-primary);
+        font-weight: 700;
+    }
+
+    .login-header p {
+        color: var(--text-secondary);
+        margin-top: 0.5rem;
+    }
+
+    .form-group {
+        margin-bottom: 2rem;
+        text-align: left;
+    }
+
+    .form-group label {
+        display: block;
+        margin-bottom: 0.75rem;
+        color: var(--text-primary);
+        font-weight: 600;
+        font-size: 0.95rem;
+    }
+
+    .select-input {
+        width: 100%;
+        padding: 0.85rem 1rem;
+        border: 2px solid #e2e8f0;
+        border-radius: 10px;
+        background-color: var(--white);
+        color: var(--text-primary);
+        font-family: inherit;
+        font-size: 1rem;
+        transition: all 0.3s ease;
+        appearance: none;
+        background-image: url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%234a5568' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3e%3cpolyline points='6 9 12 15 18 9'%3e%3c/polyline%3e%3c/svg%3e");
+        background-repeat: no-repeat;
+        background-position: right 1rem center;
+        background-size: 1.25em;
+    }
+
+    .select-input:focus {
+        outline: none;
+        border-color: var(--primary-color);
+        box-shadow: 0 0 0 3px rgba(52, 152, 219, 0.15);
+    }
+
+    .login-btn {
+        width: 100%;
+        padding: 0.85rem;
+        background: var(--primary-color);
+        color: white;
+        border: none;
+        border-radius: 10px;
+        font-size: 1rem;
+        font-weight: 600;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 0.5rem;
+    }
+
+    .login-btn:hover {
+        background: var(--primary-dark);
+        transform: translateY(-2px);
+        box-shadow: 0 6px 20px rgba(52, 152, 219, 0.25);
+    }
+
+    .alert {
+        padding: 0.85rem 1.25rem;
+        border-radius: 10px;
+        margin-bottom: 1.5rem;
+        font-size: 0.95rem;
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+        animation: fadeIn 0.3s ease-out;
+    }
+</style>
+
+<div class="login-container">
+    <div class="login-header">
+        <i class="fas fa-calendar-check"></i>
+        <h2>Welcome to EventHub</h2>
+        <p>Select a profile below to log in</p>
+    </div>
+
+    {% with messages = get_flashed_messages(with_categories=true) %}
+        {% if messages %}
+            {% for category, message in messages %}
+                <div class="alert alert-{{ 'success' if category == 'success' else 'error' if category == 'error' else 'info' }}">
+                    <i class="fas {{ 'fa-check-circle' if category == 'success' else 'fa-exclamation-circle' if category == 'error' else 'fa-info-circle' }}"></i>
+                    {{ message }}
+                </div>
+            {% endfor %}
+        {% endif %}
+    {% endwith %}
+
+    <form method="POST">
+        <div class="form-group">
+            <label for="user_id">Select User Account</label>
+            <select name="user_id" id="user_id" class="select-input" required>
+                <option value="" disabled selected>Choose an account...</option>
+                {% for u in available_users %}
+                    <option value="{{ u.user_id }}">{{ u.name }} ({{ u.role | capitalize }})</option>
+                {% endfor %}
+            </select>
+        </div>
+        <button type="submit" class="login-btn">
+            Sign In <i class="fas fa-arrow-right"></i>
+        </button>
+    </form>
+</div>
+{% endblock %}

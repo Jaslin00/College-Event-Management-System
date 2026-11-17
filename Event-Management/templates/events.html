@@ -1,0 +1,202 @@
+{% extends "base.html" %}
+{% block content %}
+<style>
+    .events-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 2.5rem;
+        flex-wrap: wrap;
+        gap: 1rem;
+    }
+
+    .events-title h2 {
+        font-size: 2.2rem;
+        color: var(--text-primary);
+        font-weight: 700;
+    }
+
+    .events-title p {
+        color: var(--text-secondary);
+        font-size: 1.05rem;
+        margin-top: 0.25rem;
+    }
+
+    .header-actions {
+        display: flex;
+        gap: 1rem;
+    }
+
+    .events-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
+        gap: 2rem;
+    }
+
+    .event-card {
+        background: var(--white);
+        border-radius: 16px;
+        padding: 2rem;
+        box-shadow: 0 4px 20px rgba(0, 0, 0, 0.05);
+        border: 1px solid rgba(0, 0, 0, 0.03);
+        display: flex;
+        flex-direction: column;
+        justify-content: space-between;
+        min-height: 280px;
+        transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+
+    .event-card:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 12px 30px rgba(0, 0, 0, 0.08);
+    }
+
+    .event-tag {
+        align-self: flex-start;
+        padding: 0.35rem 0.85rem;
+        border-radius: 20px;
+        font-size: 0.85rem;
+        font-weight: 600;
+        background: rgba(52, 152, 219, 0.1);
+        color: var(--primary-color);
+        margin-bottom: 1.25rem;
+    }
+
+    .event-name {
+        font-size: 1.4rem;
+        color: var(--text-primary);
+        font-weight: 700;
+        margin-bottom: 0.75rem;
+    }
+
+    .event-info {
+        display: flex;
+        flex-direction: column;
+        gap: 0.5rem;
+        margin-bottom: 1.25rem;
+        color: var(--text-secondary);
+        font-size: 0.95rem;
+    }
+
+    .event-info-item {
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+    }
+
+    .event-info-item i {
+        color: var(--primary-color);
+        width: 18px;
+    }
+
+    .event-desc {
+        color: #4a5568;
+        font-size: 0.95rem;
+        line-height: 1.5;
+        margin-bottom: 1.5rem;
+        display: -webkit-box;
+        -webkit-line-clamp: 3;
+        -webkit-box-orient: vertical;
+        overflow: hidden;
+    }
+
+    .card-actions {
+        display: flex;
+        gap: 0.75rem;
+        margin-top: auto;
+    }
+
+    .card-actions .btn {
+        flex: 1;
+        padding: 0.65rem 1rem;
+        font-size: 0.9rem;
+        justify-content: center;
+        border-radius: 10px;
+    }
+
+    .btn-outline {
+        border: 2px solid var(--primary-color);
+        color: var(--primary-color);
+        background: transparent;
+    }
+
+    .btn-outline:hover {
+        background: rgba(52, 152, 219, 0.05);
+    }
+</style>
+
+<div class="events-header">
+    <div class="events-title">
+        <h2>Campus Events</h2>
+        <p>Explore and register for upcoming events and workshops</p>
+    </div>
+    {% if session.get('role') == 'organizer' %}
+    <div class="header-actions">
+        <a href="{{ url_for('add_event') }}" class="btn btn-primary">
+            <i class="fas fa-plus"></i> Add Event
+        </a>
+        <a href="{{ url_for('add_score') }}" class="btn btn-secondary">
+            <i class="fas fa-trophy"></i> Update Score
+        </a>
+        <a href="{{ url_for('show_scoreboard') }}" class="btn btn-outline" style="border-color: var(--secondary-color); color: var(--secondary-color);">
+            <i class="fas fa-list-ol"></i> Scoreboard
+        </a>
+    </div>
+    {% else %}
+    <div class="header-actions">
+        <a href="{{ url_for('show_scoreboard') }}" class="btn btn-primary" style="background: var(--secondary-color);">
+            <i class="fas fa-trophy"></i> Scoreboard
+        </a>
+    </div>
+    {% endif %}
+</div>
+
+{% with messages = get_flashed_messages(with_categories=true) %}
+    {% if messages %}
+        {% for category, message in messages %}
+            <div class="alert alert-{{ 'success' if category == 'success' else 'error' if category == 'error' else 'info' }}" style="margin-bottom: 2rem;">
+                <i class="fas {{ 'fa-check-circle' if category == 'success' else 'fa-exclamation-circle' if category == 'error' else 'fa-info-circle' }}"></i>
+                {{ message }}
+            </div>
+        {% endfor %}
+    {% endif %}
+{% endwith %}
+
+<div class="events-grid">
+    {% for event in events %}
+    <div class="event-card">
+        <div class="event-tag">
+            <i class="fas fa-tag"></i> Workshop
+        </div>
+        <h3 class="event-name">{{ event.name }}</h3>
+        <div class="event-info">
+            <div class="event-info-item">
+                <i class="far fa-calendar-alt"></i>
+                <span>{{ event.date.strftime('%B %d, %Y') }}</span>
+            </div>
+            <div class="event-info-item">
+                <i class="far fa-clock"></i>
+                <span>{{ event.time }}</span>
+            </div>
+            <div class="event-info-item">
+                <i class="fas fa-users"></i>
+                <span>{{ event.participants | length }} Registered</span>
+            </div>
+        </div>
+        <p class="event-desc">{{ event.description }}</p>
+        <div class="card-actions">
+            <a href="{{ url_for('event_details', event_id=event.id) }}" class="btn btn-primary">
+                View Details
+            </a>
+            {% if session.get('role') == 'organizer' %}
+            <a href="{{ url_for('view_participants', event_id=event.id) }}" class="btn btn-outline">
+                <i class="fas fa-user-friends"></i> Participants
+            </a>
+            {% endif %}
+        </div>
+    </div>
+    {% else %}
+    <p>No events currently scheduled.</p>
+    {% endfor %}
+</div>
+{% endblock %}
